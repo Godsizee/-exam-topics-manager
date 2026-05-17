@@ -119,8 +119,8 @@ export default function TopicsManager({ initialTopics }: TopicsManagerProps) {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  const handleAddTopic = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddTopic = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     const text = newTopicText.trim();
     if (!text) return;
 
@@ -161,6 +161,15 @@ export default function TopicsManager({ initialTopics }: TopicsManagerProps) {
     
     // Auto refocus
     setTimeout(() => inputRef.current?.focus(), 50);
+  };
+
+  const handlePointerDownSubmit = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (e.button !== 0) return;
+    const text = newTopicText.trim();
+    if (!text) return;
+    
+    e.preventDefault();
+    handleAddTopic();
   };
 
   const handleDeleteTopic = async (subject: Subject, id: string) => {
@@ -315,7 +324,7 @@ export default function TopicsManager({ initialTopics }: TopicsManagerProps) {
         <div className="flex items-center gap-2 self-start md:self-center">
           <button
             onClick={exportToClipboard}
-            className="touch-target flex items-center gap-2 px-4 py-2 rounded-xl border border-card-border bg-card hover:bg-background/80 font-semibold text-sm transition-all duration-200 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-accent"
+            className="touch-target flex items-center gap-2 px-4 py-2 rounded-xl border border-card-border bg-card md:hover:bg-background/80 active:bg-slate-100 dark:active:bg-slate-900 active:scale-95 font-semibold text-sm transition-all duration-100 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-accent"
             title="Kopiert alle Fächer als strukturierte Liste"
           >
             {copied ? (
@@ -333,7 +342,7 @@ export default function TopicsManager({ initialTopics }: TopicsManagerProps) {
 
           <button
             onClick={toggleTheme}
-            className="touch-target p-2 rounded-xl border border-card-border bg-card hover:bg-background/80 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-accent focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            className="touch-target p-2 rounded-xl border border-card-border bg-card md:hover:bg-background/80 active:bg-slate-100 dark:active:bg-slate-900 active:scale-95 transition-all duration-100 focus:outline-none focus:ring-2 focus:ring-primary-accent focus:ring-offset-2 dark:focus:ring-offset-slate-900"
             aria-label="Design-Farbschema wechseln"
             title={theme === 'light' ? 'Dunkelmodus aktivieren' : 'Hellmodus aktivieren'}
           >
@@ -402,10 +411,10 @@ export default function TopicsManager({ initialTopics }: TopicsManagerProps) {
                     localStorage.setItem('active_subject', subject);
                     setSearchQuery('');
                   }}
-                  className={`flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 cursor-pointer shrink-0 focus:outline-none focus:ring-2 focus:ring-primary-accent/40 ${
+                  className={`flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-150 active:scale-[0.97] cursor-pointer shrink-0 focus:outline-none focus:ring-2 focus:ring-primary-accent/40 ${
                     isActive
                       ? 'bg-white dark:bg-slate-900 text-primary-accent shadow-md scale-[1.02] border border-slate-200/30 dark:border-white/5'
-                      : 'text-text-secondary hover:text-foreground hover:bg-white/40 dark:hover:bg-slate-900/30'
+                      : 'text-text-secondary md:hover:text-foreground md:hover:bg-white/40 dark:md:hover:bg-slate-900/30'
                   }`}
                 >
                   <Icon className={`w-4 h-4 transition-transform duration-300 ${isActive ? 'scale-110 rotate-3' : ''}`} />
@@ -467,7 +476,8 @@ export default function TopicsManager({ initialTopics }: TopicsManagerProps) {
               <button
                 type="submit"
                 disabled={!newTopicText.trim()}
-                className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-primary-accent hover:bg-primary-accent-hover text-white font-semibold text-sm transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md cursor-pointer shrink-0"
+                onPointerDown={handlePointerDownSubmit}
+                className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-primary-accent md:hover:bg-primary-accent-hover active:bg-primary-accent-hover/80 active:scale-98 text-white font-semibold text-sm transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed md:hover:shadow-md cursor-pointer shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 <span>Hinzufügen</span>
@@ -554,7 +564,7 @@ export default function TopicsManager({ initialTopics }: TopicsManagerProps) {
 
                   <button
                     onClick={() => handleDeleteTopic(activeSubject, topic.id)}
-                    className="touch-target p-2 text-text-secondary hover:text-red-500 bg-transparent hover:bg-red-500/10 dark:hover:bg-red-500/15 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer shrink-0"
+                    className="touch-target p-2 text-text-secondary md:hover:text-red-500 bg-transparent md:hover:bg-red-500/10 dark:md:hover:bg-red-500/15 active:bg-red-500/15 active:text-red-500 active:scale-90 rounded-xl transition-all duration-100 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer shrink-0"
                     aria-label={`Thema "${topic.title}" löschen`}
                     title="Thema entfernen"
                   >

@@ -86,10 +86,16 @@ export default function TopicsManager({ initialTopics }: TopicsManagerProps) {
     setTopics(initialTopics);
   }, [initialTopics]);
 
-  // Initialize theme client-side
+  // Initialize theme and active subject tab client-side
   useEffect(() => {
     setIsMounted(true);
     
+    // Load active subject tab
+    const savedSubject = localStorage.getItem('active_subject') as Subject | null;
+    if (savedSubject && SUBJECTS.includes(savedSubject)) {
+      setActiveSubject(savedSubject);
+    }
+
     // Load Theme
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -212,13 +218,17 @@ export default function TopicsManager({ initialTopics }: TopicsManagerProps) {
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     if (e.key === 'ArrowRight') {
       const nextIndex = (index + 1) % SUBJECTS.length;
-      setActiveSubject(SUBJECTS[nextIndex]);
-      const nextTab = document.getElementById(`tab-${SUBJECTS[nextIndex]}`);
+      const nextSubject = SUBJECTS[nextIndex];
+      setActiveSubject(nextSubject);
+      localStorage.setItem('active_subject', nextSubject);
+      const nextTab = document.getElementById(`tab-${nextSubject}`);
       nextTab?.focus();
     } else if (e.key === 'ArrowLeft') {
       const nextIndex = (index - 1 + SUBJECTS.length) % SUBJECTS.length;
-      setActiveSubject(SUBJECTS[nextIndex]);
-      const prevTab = document.getElementById(`tab-${SUBJECTS[nextIndex]}`);
+      const nextSubject = SUBJECTS[nextIndex];
+      setActiveSubject(nextSubject);
+      localStorage.setItem('active_subject', nextSubject);
+      const prevTab = document.getElementById(`tab-${nextSubject}`);
       prevTab?.focus();
     }
   };
@@ -389,6 +399,7 @@ export default function TopicsManager({ initialTopics }: TopicsManagerProps) {
                   onKeyDown={(e) => handleKeyDown(e, index)}
                   onClick={() => {
                     setActiveSubject(subject);
+                    localStorage.setItem('active_subject', subject);
                     setSearchQuery('');
                   }}
                   className={`flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 cursor-pointer shrink-0 focus:outline-none focus:ring-2 focus:ring-primary-accent/40 ${
